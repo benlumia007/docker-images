@@ -13,8 +13,6 @@ RUN rm -rf /var/lib/apt/lists/* \
 
 RUN mkdir /docker-entrypoint-initdb.d
 
-RUN pip3 install shyaml
-
 VOLUME /var/lib/mysql
 
 # Config files
@@ -22,8 +20,6 @@ COPY templates/mysql/.my.cnf /root/.my.cnf
 COPY templates/mysql/config /etc/mysql
 COPY templates/mysql/docker-entrypoint.sh /usr/local/bin
 ENTRYPOINT ["docker-entrypoint.sh"]
-
-WORKDIR /app
 
 EXPOSE 3306 33060
 CMD [ "mysqld" ]
