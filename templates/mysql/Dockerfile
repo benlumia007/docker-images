@@ -21,10 +21,9 @@ VOLUME /var/lib/mysql
 COPY templates/mysql/.my.cnf /root/.my.cnf
 COPY templates/mysql/config /etc/mysql
 COPY templates/mysql/docker-entrypoint.sh /usr/local/bin
-RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 WORKDIR /app
 
 EXPOSE 3306 33060
-CMD service mysql start
+CMD [ "mysqld" ]
