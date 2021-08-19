@@ -11,6 +11,7 @@ RUN apt-get upgrade -y
 RUN apt-get install --no-install-recommends \
     build-essential \
     curl \
+    dirmngr \
     dkms \
     git \
     gnupg \
