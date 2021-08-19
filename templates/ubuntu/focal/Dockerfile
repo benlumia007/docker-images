@@ -17,6 +17,8 @@ RUN apt-get install --no-install-recommends \
     gnupg \
     less \
     nano \
+    perl \
+    pwgen \
     python3-pip \
     python3-setuptools \
     python3-wheel \
@@ -24,4 +26,5 @@ RUN apt-get install --no-install-recommends \
     sudo \
     unzip \
     wget \
+    xz-utils \
     -y
