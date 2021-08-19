@@ -1,24 +1,17 @@
 FROM benlumia007/ubuntu:20.04
 
-# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN groupadd -r mysql && useradd -r -g mysql mysql
+RUN apt-get update -y
 
-RUN mkdir /docker-entrypoint-initdb.d
+RUN apt-get install --no-install-recommends \
+	mysql-server \
+	-y
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		pwgen \
-		perl \
-		xz-utils \
-	&& rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update \
-	&& apt-get install -y \
-		mysql-server \
-	&& rm -rf /var/lib/apt/lists/* \
+RUN rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
 	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
-# ensure that /var/run/mysqld (used for socket and lock files) is writable regardless of the UID our mysqld instance ends up having at runtime
 	&& chmod 1777 /var/run/mysqld /var/lib/mysql
+
+RUN mkdir /docker-entrypoint-initdb.d
 
 RUN pip3 install shyaml
 
