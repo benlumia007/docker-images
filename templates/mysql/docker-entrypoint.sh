@@ -168,20 +168,7 @@ docker_create_db_directories() {
 
 # initializes the database directory
 docker_init_database_dir() {
-	mysql_note "Initializing database files"
-	if [ "$MYSQL_MAJOR" = '5.6' ]; then
-		mysql_install_db --datadir="$DATADIR" --rpm --keep-my-cnf "${@:2}" --default-time-zone=SYSTEM
-	else
-		"$@" --initialize-insecure --default-time-zone=SYSTEM
-	fi
-	mysql_note "Database files initialized"
-
-	if command -v mysql_ssl_rsa_setup > /dev/null && [ ! -e "$DATADIR/server-key.pem" ]; then
-		# https://github.com/mysql/mysql-server/blob/23032807537d8dd8ee4ec1c4d40f0633cd4e12f9/packaging/deb-in/extra/mysql-systemd-start#L81-L84
-		mysql_note "Initializing certificates"
-		mysql_ssl_rsa_setup --datadir="$DATADIR"
-		mysql_note "Certificates initialized"
-	fi
+	"$@" --initialize-insecure --default-time-zone=SYSTEM
 }
 
 # Loads various settings that are used elsewhere in the script
