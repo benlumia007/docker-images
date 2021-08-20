@@ -90,10 +90,10 @@ _mysql_passfile() {
 	# echo the password to the "file" the client uses
 	# the client command will use process substitution to create a file on the fly
 	# ie: --defaults-extra-file=<( _mysql_passfile )
-	if [ '--dont-use-mysql-root-password' != "$1" ] && [ -n "$MYSQL_ROOT_PASSWORD" ]; then
+	if [ '--dont-use-mysql-root-password' != "$1" ] && [ -n "root" ]; then
 		cat <<-EOF
 			[client]
-			password="${MYSQL_ROOT_PASSWORD}"
+			password="root"
 		EOF
 	fi
 }
