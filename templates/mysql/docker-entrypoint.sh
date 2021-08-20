@@ -37,10 +37,12 @@ processing_sql() {
 # Initializes database with timezone info and root password, plus optional extra db/user
 setup_database() {
 	processing_sql --dont-use-mysql-root-password --database=mysql <<-EOSQL
-		ALTER USER 'root'@'localhost' IDENTIFIED BY 'root' ;
-		GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
-		FLUSH PRIVILEGES ;
-		DROP DATABASE IF EXISTS test ;
+		CREATE USER 'root'@'%' IDENTIFIED BY 'root';
+		GRANT ALL ON *.* TO 'root'@'%' 	WITH GRANT OPTION;
+		ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
+		GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+		FLUSH PRIVILEGES;
+		DROP DATABASE IF EXISTS test;
 	EOSQL
 }
 
