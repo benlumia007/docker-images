@@ -12,9 +12,5 @@ COPY templates/mysql/config /etc/mysql
 COPY templates/mysql/docker-entrypoint.sh /usr/local/bin
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-RUN pip3 install shyaml
-
-WORKDIR /app
-
 EXPOSE 3306 33060
 CMD [ "mysqld" ]
