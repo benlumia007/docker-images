@@ -1,98 +1,10 @@
 #!/bin/bash
-set -eo pipefail
-shopt -s nullglob
-
-# logging functions
-mysql_log() {
-	local type="$1"; shift
-	# accept argument string or stdin
-	local text="$*"; if [ "$#" -eq 0 ]; then text="$(cat)"; fi
-	local dt; dt="$(date --rfc-3339=seconds)"
-	printf '%s [%s] [Entrypoint]: %s\n' "$dt" "$type" "$text"
-}
-mysql_note() {
-	mysql_log Note "$@"
-}
-mysql_warn() {
-	mysql_log Warn "$@" >&2
-}
-mysql_error() {
-	mysql_log ERROR "$@" >&2
-	exit 1
-}
-
-# usage: file_env VAR [DEFAULT]
-#    ie: file_env 'XYZ_DB_PASSWORD' 'example'
-# (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
-#  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
-file_env() {
-	local var="$1"
-	local fileVar="${var}_FILE"
-	local def="${2:-}"
-	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
-		mysql_error "Both $var and $fileVar are set (but are exclusive)"
-	fi
-	local val="$def"
-	if [ "${!var:-}" ]; then
-		val="${!var}"
-	elif [ "${!fileVar:-}" ]; then
-		val="$(< "${!fileVar}")"
-	fi
-	export "$var"="$val"
-	unset "$fileVar"
-}
-
-# check to see if this file is being run or sourced from another script
-_is_sourced() {
-	# https://unix.stackexchange.com/a/215279
-	[ "${#FUNCNAME[@]}" -ge 2 ] \
-		&& [ "${FUNCNAME[0]}" = '_is_sourced' ] \
-		&& [ "${FUNCNAME[1]}" = 'source' ]
-}
-
-# usage: docker_process_init_files [file [file [...]]]
-#    ie: docker_process_init_files /always-initdb.d/*
-# process initializer files, based on file extensions
-docker_process_init_files() {
-	# mysql here for backwards compatibility "${mysql[@]}"
-	mysql=( docker_process_sql )
-
-	echo
-	local f
-	for f; do
-		case "$f" in
-			*.sh)
-				# https://github.com/docker-library/postgres/issues/450#issuecomment-393167936
-				# https://github.com/docker-library/postgres/pull/452
-				if [ -x "$f" ]; then
-					mysql_note "$0: running $f"
-					"$f"
-				else
-					mysql_note "$0: sourcing $f"
-					. "$f"
-				fi
-				;;
-			*.sql)    mysql_note "$0: running $f"; docker_process_sql < "$f"; echo ;;
-			*.sql.gz) mysql_note "$0: running $f"; gunzip -c "$f" | docker_process_sql; echo ;;
-			*.sql.xz) mysql_note "$0: running $f"; xzcat "$f" | docker_process_sql; echo ;;
-			*)        mysql_warn "$0: ignoring $f" ;;
-		esac
-		echo
-	done
-}
 
 # arguments necessary to run "mysqld --verbose --help" successfully (used for testing configuration validity and for extracting default/configured values)
 _verboseHelpArgs=(
 	--verbose --help
 	--log-bin-index="$(mktemp -u)" # https://github.com/docker-library/mysql/issues/136
 )
-
-mysql_check_config() {
-	local toRun=( "$@" "${_verboseHelpArgs[@]}" ) errors
-	if ! errors="$("${toRun[@]}" 2>&1 >/dev/null)"; then
-		mysql_error $'mysqld failed while attempting to check config\n\tcommand was: '"${toRun[*]}"$'\n\t'"$errors"
-	fi
-}
 
 # Fetch value from server config
 # We use mysqld --verbose --help instead of my_print_defaults because the
@@ -148,10 +60,6 @@ docker_setup_env() {
 	DATADIR="$(mysql_get_config 'datadir' "$@")"
 	SOCKET="$(mysql_get_config 'socket' "$@")"
 
-	# Initialize values that might be stored in a file
-	file_env 'MYSQL_ROOT_HOST' '%'
-	file_env 'MYSQL_ROOT_PASSWORD' 'root'
-
 	declare -g DATABASE_ALREADY_EXISTS
 	if [ -d "$DATADIR/mysql" ]; then
 		DATABASE_ALREADY_EXISTS='true'
@@ -171,7 +79,7 @@ docker_process_sql() {
 docker_setup_db() {
 	# tell docker_process_sql to not use MYSQL_ROOT_PASSWORD since it is just now being set
 	docker_process_sql --dont-use-mysql-root-password --database=mysql <<-EOSQL
-		ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' ;
+		ALTER USER 'root'@'localhost' IDENTIFIED BY 'root' ;
 		GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
 		FLUSH PRIVILEGES ;
 		DROP DATABASE IF EXISTS test ;
@@ -205,14 +113,9 @@ _mysql_want_help() {
 }
 
 _main() {
-	# if command starts with an option, prepend mysqld
-	if [ "${1:0:1}" = '-' ]; then
-		set -- mysqld "$@"
-	fi
-
 	# skip setup if they aren't running mysqld or want an option that stops mysqld
 	if [ "$1" = 'mysqld' ] && ! _mysql_want_help "$@"; then
-		mysql_check_config "$@"
+	
 		# Load various environment variables
 		docker_setup_env "$@"
 		docker_create_db_directories
@@ -237,7 +140,4 @@ _main() {
 	exec "$@"
 }
 
-# If we are sourced from elsewhere, don't perform any further actions
-if ! _is_sourced; then
-	_main "$@"
-fi
+_main "$@"
