@@ -11,8 +11,6 @@ RUN rm -rf /var/lib/apt/lists/* \
 	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
 	&& chmod 1777 /var/run/mysqld /var/lib/mysql
 
-RUN mkdir /docker-entrypoint-initdb.d
-
 VOLUME /var/lib/mysql
 
 # Config files
