@@ -1,14 +1,5 @@
 #!/bin/bash
 
-_mysql_passfile() {
-	if [ '--dont-use-mysql-root-password' != "$1" ] && [ -n "root" ]; then
-		cat <<-EOF
-			[client]
-			password="root"
-		EOF
-	fi
-}
-
 # Here, we are going to setup some variables for later use. This allows us to use
 # variables anywhere.
 setup_environment_variables() {
@@ -29,14 +20,9 @@ initialize_database_directory() {
 	"$@" --initialize-insecure --default-time-zone=SYSTEM
 }
 
-# Here, we are going to make sure that the root password is set up properly
-processing_sql() {
-	mysql --protocol=socket -uroot -hlocalhost --socket="${socket}"
-}
-
 # Initializes database with timezone info and root password, plus optional extra db/user
 setup_database() {
-	processing_sql --dont-use-mysql-root-password --database=mysql <<-EOSQL
+	mysql --protocol=socket -uroot -hlocalhost --socket="${socket}" --database=mysql <<-EOSQL
 		CREATE USER 'root'@'%' IDENTIFIED BY 'root';
 		GRANT ALL ON *.* TO 'root'@'%' 	WITH GRANT OPTION;
 		ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
@@ -58,6 +44,15 @@ start_server() {
 stop_server() {
 	if ! mysqladmin --defaults-extra-file=<( _mysql_passfile ) shutdown -uroot --socket="${socket}"; then
 		echo "Unable to shut down server."
+	fi
+}
+
+_mysql_passfile() {
+	if [ '--dont-use-mysql-root-password' != "$1" ] && [ -n "root" ]; then
+		cat <<-EOF
+			[client]
+			password="root"
+		EOF
 	fi
 }
 
