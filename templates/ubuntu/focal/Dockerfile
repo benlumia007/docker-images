@@ -9,6 +9,7 @@ RUN apt-get upgrade -y
 
 # Here, we are going to add some basic requirements
 RUN apt-get install --no-install-recommends \
+    acl \
     build-essential \
     curl \
     dkms \
