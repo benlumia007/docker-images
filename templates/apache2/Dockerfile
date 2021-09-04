@@ -26,4 +26,6 @@ RUN a2dissite default-ssl.conf
 RUN rm -rf /etc/apache2/sites-available/000-default.conf
 RUN rm -rf /etc/apache2/sites-available/default-ssl.conf
 
-CMD apachectl -D FOREGROUND
+ADD templates/apache2/config/supervisord/apache2.conf /etc/supervisor/conf.d/apache2.conf
+
+CMD [ "supervisord", "-n" ]

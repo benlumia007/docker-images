@@ -12,7 +12,6 @@ RUN apt-get install --no-install-recommends \
     build-essential \
     curl \
     dkms \
-    git \
     gnupg \
     less \
     nano \
@@ -20,7 +19,9 @@ RUN apt-get install --no-install-recommends \
     python3-setuptools \
     python3-wheel \
     software-properties-common \
+    supervisor \
     sudo \
     unzip \
     wget \
+    zip \
     -y
