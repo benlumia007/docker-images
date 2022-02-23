@@ -10,6 +10,7 @@ RUN apt-get upgrade -y
 # Here, we are going to add some basic requirements
 RUN apt-get install --no-install-recommends \
     build-essential \
+    ca-certificates \
     curl \
     dkms \
     gnupg \
@@ -25,3 +26,15 @@ RUN apt-get install --no-install-recommends \
     wget \
     zip \
     -y
+
+# Here, we are going to add docker user.
+RUN adduser --disabled-password docker && \
+    echo 'docker ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/docker && \
+    chmod 440 /etc/sudoers.d/docker
+
+
+#Here, we are going to set user as docker for the container
+USER docker
+
+# Set the current directory for docker's home directory
+WORKDIR /home/docker
