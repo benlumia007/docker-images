@@ -32,9 +32,6 @@ RUN adduser --disabled-password docker && \
     echo 'docker ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/docker && \
     chmod 440 /etc/sudoers.d/docker
 
-
-#Here, we are going to set user as docker for the container
 USER docker
 
-# Set the current directory for docker's home directory
 WORKDIR /home/docker
