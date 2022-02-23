@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   server:
-    image: benlumia007/apache2
+    image: benlumia007/nginx
     container_name: server
     restart: always
     ports:
