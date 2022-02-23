@@ -205,7 +205,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/lemp:php7.3-fpm
 
-
   lemp74:
     runs-on: ubuntu-latest
     steps:
