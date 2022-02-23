@@ -4,7 +4,7 @@ FROM benlumia007/ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Here, we are going to install some basic packages to get the server going.
-RUN apt-get install --no-install-recommends \
+RUN sudo apt-get install --no-install-recommends \
     php-imagick \
     php-memcache \
     php-memcached \
@@ -13,7 +13,7 @@ RUN apt-get install --no-install-recommends \
     -y
 
 # Here, we are going to install PHP 7.4 and 8.0
-RUN apt-get install --no-install-recommends \
+RUN sudo apt-get install --no-install-recommends \
     php7.4-bcmath \
     php7.4-cli \
     php7.4-common \
@@ -33,10 +33,13 @@ RUN apt-get install --no-install-recommends \
     -y
 
 # Here, we are going to amke sure the /run/php is available.
-RUN mkdir -p /run/php && \
-    rm -rf /etc/apache2/conf-available/other-vhosts-access-log.conf
+RUN sudo mkdir -p /run/php && \
+    sudo rm -rf /etc/apache2/conf-available/other-vhosts-access-log.conf
 
 # Here we are going to add some basic files
 ADD templates/php/7.4/config/supervisord/php7.4-fpm.conf /etc/supervisor/conf.d/php7.4-fpm.conf
+ADD templates/php/7.4/config/supervisord/start.sh /usr/local/bin/start
 
-CMD [ "supervisord", "-n" ]
+RUN sudo chmod +x /usr/local/bin/start
+
+CMD [ "start" ]

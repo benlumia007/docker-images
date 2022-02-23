@@ -4,10 +4,10 @@ FROM benlumia007/ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Here, we are going to grab some ppa packages
-RUN add-apt-repository ppa:ondrej/php -y
+RUN sudo add-apt-repository ppa:ondrej/php -y
 
 # Here, we are going to install some basic packages to get the server going.
-RUN apt-get install --no-install-recommends \
+RUN sudo apt-get install --no-install-recommends \
     php-imagick \
     php-memcache \
     php-memcached \
@@ -16,7 +16,7 @@ RUN apt-get install --no-install-recommends \
     -y
 
 # Here, we are going to install PHP 8.0 and 8.0
-RUN apt-get install --no-install-recommends \
+RUN sudo apt-get install --no-install-recommends \
     php8.0-bcmath \
     php8.0-cli \
     php8.0-common \
@@ -34,10 +34,13 @@ RUN apt-get install --no-install-recommends \
     -y
 
 # Here, we are going to amke sure the /run/php is available.
-RUN mkdir -p /run/php && \
-    rm -rf /etc/apache2/conf-available/other-vhosts-access-log.conf
+RUN sudo mkdir -p /run/php && \
+    sudo rm -rf /etc/apache2/conf-available/other-vhosts-access-log.conf
 
 # Here we are going to add some basic files
 ADD templates/php/8.0/config/supervisord/php8.0-fpm.conf /etc/supervisor/conf.d/php8.0-fpm.conf
+ADD templates/php/7.4/config/supervisord/start.sh /usr/local/bin/start
 
-CMD [ "supervisord", "-n" ]
+RUN sudo chmod +x /usr/local/bin/start
+
+CMD [ "start" ]
