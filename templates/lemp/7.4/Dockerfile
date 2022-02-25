@@ -52,12 +52,12 @@ ADD templates/lemp/7.4/config/php/upstream/upstream.conf /etc/nginx/upstream/php
 ADD templates/lemp/7.4/config/php/fpm/fpm.conf /etc/php/7.4/fpm/pool.d/www.conf
 
 # Here, we are gong to make sure tht some of the configurations are set for php8.0-fpm.
-ADD templates/lemp/7.4/config/supervisord/main.conf /etc/supervisor/conf.d/main.conf
-ADD templates/lemp/7.4/config/supervisord/start.sh /usr/local/bin/start
+ADD templates/lemp/7.4/config/supervisord/lemp.conf /etc/supervisor/conf.d/lemp.conf
+ADD templates/lemp/7.4/config/supervisord/start.sh /usr/local/bin/start_lemp
 ADD templates/lemp/7.4/config/mysql/my.cnf /root/.my.cnf
 ADD templates/lemp/7.4/config/mysql/my.cnf /home/docker/.my.cnf
 RUN sudo mkdir -p /run/php && \
-    sudo chmod +x /usr/local/bin/start
+    sudo chmod +x /usr/local/bin/start_lemp
 
 # Here, we are going to enable some php features
 RUN sudo phpenmod php7.4-custom
@@ -70,4 +70,4 @@ RUN sudo service mysql start 2> /dev/null && \
     sudo mysql -u root -e "FLUSH PRIVILEGES;" && \
     sudo service mysql stop
 
-CMD [ "start" ]
+CMD [ "start_lemp" ]
