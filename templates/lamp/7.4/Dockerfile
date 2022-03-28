@@ -57,6 +57,7 @@ RUN sudo a2dissite 000-default.conf && \
     sudo rm -rf /etc/apache2/sites-available/default-ssl.conf
 
 # Here, we are gong to make sure tht some of the configurations are set first.
+ADD templates/lamp/7.4/config/apache2/envvars /etc/apache2/envvars
 ADD templates/lamp/7.4/config/php/custom/custom.ini /etc/php/7.4/mods-available/php7.4-custom.ini
 ADD templates/lamp/7.4/config/php/fpm/fpm.conf /etc/php/7.4/fpm/pool.d/www.conf
 ADD templates/lamp/7.4/config/mailhog/mailhog.ini /etc/php/7.4/mods-available/php7.4-mailhog.ini
