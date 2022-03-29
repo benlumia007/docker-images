@@ -50,17 +50,25 @@ ADD templates/lemp/7.4/config/nginx/nginx.conf /etc/nginx/nginx.conf
 ADD templates/lemp/7.4/config/php/custom/custom.ini /etc/php/7.4/mods-available/php7.4-custom.ini
 ADD templates/lemp/7.4/config/php/upstream/upstream.conf /etc/nginx/upstream/php7.4-fpm.conf
 ADD templates/lemp/7.4/config/php/fpm/fpm.conf /etc/php/7.4/fpm/pool.d/www.conf
+ADD templates/lemp/7.4/config/mailhog/mailhog.ini /etc/php/7.4/mods-available/php7.4-mailhog.ini
 
 # Here, we are gong to make sure tht some of the configurations are set for php8.0-fpm.
 ADD templates/lemp/7.4/config/supervisord/lemp.conf /etc/supervisor/conf.d/lemp.conf
-ADD templates/lemp/7.4/config/supervisord/start.sh /usr/local/bin/start_lemp
+ADD templates/lemp/7.4/config/supervisord/start.sh /usr/local/bin/start
 ADD templates/lemp/7.4/config/mysql/my.cnf /root/.my.cnf
 ADD templates/lemp/7.4/config/mysql/my.cnf /home/docker/.my.cnf
 RUN sudo mkdir -p /run/php && \
-    sudo chmod +x /usr/local/bin/start_lemp
+    sudo chmod +x /usr/local/bin/start
 
 # Here, we are going to enable some php features
-RUN sudo phpenmod php7.4-custom
+RUN sudo phpenmod php7.4-custom && \
+    sudo phpenmod php7.4-mailhog
+
+RUN sudo curl --silent -L -o /usr/local/bin/mailhog https://github.com/mailhog/MailHog/releases/download/v1.0.1/MailHog_linux_amd64 -o /usr/local/bin/mailhog && \
+    sudo curl --silent -L -o /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 -o /usr/local/bin/mhsendmail && \
+    sudo chmod +x /usr/local/bin/mailhog && \
+    sudo chmod +x /usr/local/bin/mhsendmail
+
 
 # Here, we are going to setup mysql server configurations, the stupid way but works.
 RUN sudo service mysql start 2> /dev/null && \
@@ -70,4 +78,4 @@ RUN sudo service mysql start 2> /dev/null && \
     sudo mysql -u root -e "FLUSH PRIVILEGES;" && \
     sudo service mysql stop
 
-CMD [ "start_lemp" ]
+CMD [ "start" ]
