@@ -6,12 +6,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 ## Here we are going to run and update for the latest packages.
 RUN sudo apt-get update -y
 
-# Here, we are going to install the nginx server.
+# Here, we are going to install the apache2 server.
 RUN sudo apt-get install --no-install-recommends \
     apache2 \
     -y
 
-# Here, we are going to install the basic mysql server.
+# Here, we are going to install mysql server.
 RUN sudo apt-get install --no-install-recommends \
     mysql-server \
     -y
@@ -42,7 +42,6 @@ RUN sudo apt-get install --no-install-recommends \
     php7.4-mbstring \
     php7.4-mysql \
     php7.4-soap \
-    php7.4-sqlite3 \
     php7.4-xml \
     php7.4-zip \
     -y
@@ -58,9 +57,9 @@ RUN sudo a2dissite 000-default.conf && \
 
 # Here, we are gong to make sure tht some of the configurations are set first.
 ADD templates/lamp/7.4/config/apache2/envvars /etc/apache2/envvars
-ADD templates/lamp/7.4/config/php/custom/custom.ini /etc/php/7.4/mods-available/php7.4-custom.ini
-ADD templates/lamp/7.4/config/php/fpm/fpm.conf /etc/php/7.4/fpm/pool.d/www.conf
-ADD templates/lamp/7.4/config/mailhog/mailhog.ini /etc/php/7.4/mods-available/php7.4-mailhog.ini
+ADD templates/lamp/7.4/config/php/custom/php-custom.ini /etc/php/7.4/mods-available/php-custom.ini
+ADD templates/lamp/7.4/config/php/fpm/www.conf /etc/php/7.4/fpm/pool.d/www.conf
+ADD templates/lamp/7.4/config/mailhog/mailhog.ini /etc/php/7.4/mods-available/php-mailhog.ini
 ADD templates/lamp/7.4/config/supervisord/lamp.conf /etc/supervisor/conf.d/lamp.conf
 ADD templates/lamp/7.4/config/supervisord/start.sh /usr/local/bin/start
 ADD templates/lamp/7.4/config/mysql/.my.cnf /root/.my.cnf
@@ -71,8 +70,8 @@ RUN sudo mkdir -p /run/php && \
     sudo chmod +x /usr/local/bin/start
 
 # Here, we are going to enable some php features
-RUN sudo phpenmod php7.4-custom && \
-    sudo phpenmod php7.4-mailhog
+RUN sudo phpenmod php-custom && \
+    sudo phpenmod php-mailhog
 
 # Here, we are going to setup mysql server configurations, the stupid way but works.
 RUN sudo service mysql start 2> /dev/null && \
