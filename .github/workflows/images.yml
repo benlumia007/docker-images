@@ -342,3 +342,29 @@ jobs:
           file: ./templates/lemp/8.1/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/lemp:php8.1-fpm
+
+  # LEMP with latest
+  lemp_latest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo 
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./templates/lemp/latest/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/lemp:latest
