@@ -39,7 +39,7 @@ RUN sudo apt-get install --no-install-recommends \
     php8.0-gd \
     php8.0-imap \
     php8.0-imagick \
-#    php8.0-json \
+    php8.0-intl \
     php8.0-mbstring \
     php8.0-mysql \
     php8.0-soap \
