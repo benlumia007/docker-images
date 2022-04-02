@@ -39,7 +39,7 @@ RUN sudo apt-get install --no-install-recommends \
     php8.1-gd \
     php8.1-imap \
     php8.1-imagick \
-#    php8.1-json \
+    php8.1-intl \
     php8.1-mbstring \
     php8.1-mysql \
     php8.1-soap \
