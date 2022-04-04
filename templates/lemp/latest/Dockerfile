@@ -87,16 +87,17 @@ RUN sudo apt-get install --no-install-recommends \
     -y
 
 # Here, we are gong to make sure tht some of the configurations are set for php8.1-fpm.
-ADD templates/lemp/latest/config/nginx/nginx.conf /etc/nginx/nginx.conf
-ADD templates/lemp/latest/config/php/custom/custom.ini /etc/php/8.1/mods-available/php8.1-custom.ini
+ADD templates/lemp/latest/config/nginx/nginx.conf               /etc/nginx/nginx.conf
+ADD templates/lemp/latest/config/php/custom/custom.ini          /etc/php/8.1/mods-available/php8.1-custom.ini
+ADD templates/lemp/latest/config/mailhog/mailhog.ini            /etc/php/8.1/mods-available/php8.1-mailhog.ini
 ADD templates/lemp/latest/config/php/upstream/8.1/upstream.conf /etc/nginx/upstream/php8.1-fpm.conf
-ADD templates/lemp/latest/config/php/fpm/8.1/fpm.conf /etc/php/8.1/fpm/pool.d/php8.1-fpm.conf
+ADD templates/lemp/latest/config/php/fpm/8.1/fpm.conf           /etc/php/8.1/fpm/pool.d/www.conf
 
 ADD templates/lemp/latest/config/php/upstream/8.0/upstream.conf /etc/nginx/upstream/php8.0-fpm.conf
-ADD templates/lemp/latest/config/php/fpm/8.0/fpm.conf /etc/php/8.0/fpm/pool.d/php8.0-fpm.conf
+ADD templates/lemp/latest/config/php/fpm/8.0/fpm.conf /etc/php/8.0/fpm/pool.d/www.conf
 
 ADD templates/lemp/latest/config/php/upstream/7.4/upstream.conf /etc/nginx/upstream/php7.4-fpm.conf
-ADD templates/lemp/latest/config/php/fpm/7.4/fpm.conf /etc/php/7.4/fpm/pool.d/php7.4-fpm.conf
+ADD templates/lemp/latest/config/php/fpm/7.4/fpm.conf /etc/php/7.4/fpm/pool.d/www.conf
 
 # Here, we are gong to make sure tht some of the configurations are set for php8.1-fpm.
 ADD templates/lemp/latest/config/supervisord/main.conf /etc/supervisor/conf.d/main.conf
@@ -107,8 +108,14 @@ ADD templates/lemp/latest/config/mysql/my.cnf /home/docker/.my.cnf
 RUN sudo mkdir -p /run/php && \
     sudo chmod +x /usr/local/bin/start
 
+RUN sudo curl --silent -L -o /usr/local/bin/mailhog https://github.com/mailhog/MailHog/releases/download/v1.0.1/MailHog_linux_amd64 -o /usr/local/bin/mailhog && \
+    sudo curl --silent -L -o /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 -o /usr/local/bin/mhsendmail && \
+    sudo chmod +x /usr/local/bin/mailhog && \
+    sudo chmod +x /usr/local/bin/mhsendmail
+
 # Here, we are going to enable some php features
-RUN sudo phpenmod php8.1-custom
+RUN sudo phpenmod php8.1-custom && \
+    sudo phpenmod php8.1-mailhog
 
 # Here, we are going to setup mysql server configurations, the stupid way but works.
 RUN sudo service mysql start 2> /dev/null && \
