@@ -100,6 +100,7 @@ ADD templates/lemp/latest/config/supervisord/start.sh /usr/local/bin/start
 ADD templates/lemp/latest/config/mysql/my.cnf /root/.my.cnf
 ADD templates/lemp/latest/config/mysql/my.cnf /home/docker/.my.cnf
 RUN sudo mkdir -p /run/php && \
+    sudo mkdir -p /etc/nginx/upstream && \
     sudo chmod +x /usr/local/bin/start
 
 # Here, we are going to setup mysql server configurations, the stupid way but works.
