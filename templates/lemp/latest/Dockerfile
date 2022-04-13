@@ -89,6 +89,10 @@ RUN sudo apt-get install --no-install-recommends \
 # Here, we are gong to make sure tht some of the configurations are set for php8.1-fpm.
 ADD templates/lemp/latest/config/nginx/nginx.conf               /etc/nginx/nginx.conf
 
+RUN sudo rm -rf /etc/php/7.4/fpm/pool.d/www.conf && \
+    sudo rm -rf /etc/php/8.0/fpm/pool.d/www.conf && \
+    sudo rm -rf /etc/php/8.1/fpm/pool.d/www.conf
+
 # Here, we are gong to make sure tht some of the configurations are set for php8.1-fpm.
 ADD templates/lemp/latest/config/supervisord/main.conf /etc/supervisor/conf.d/main.conf
 ADD templates/lemp/latest/config/supervisord/start.sh /usr/local/bin/start
