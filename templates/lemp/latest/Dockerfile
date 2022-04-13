@@ -88,6 +88,7 @@ RUN sudo apt-get install --no-install-recommends \
 
 # Here, we are gong to make sure tht some of the configurations are set for php8.1-fpm.
 ADD templates/lemp/latest/config/nginx/nginx.conf               /etc/nginx/nginx.conf
+ADD templates/lemp/latest/config/mailhog/mailhog.ini            /etc/php/7.4/mods-available/php7.4-mailhog.ini
 
 RUN sudo rm -rf /etc/php/7.4/fpm/pool.d/www.conf && \
     sudo rm -rf /etc/php/8.0/fpm/pool.d/www.conf && \
@@ -102,6 +103,14 @@ ADD templates/lemp/latest/config/mysql/my.cnf /home/docker/.my.cnf
 RUN sudo mkdir -p /run/php && \
     sudo mkdir -p /etc/nginx/upstream && \
     sudo chmod +x /usr/local/bin/start
+
+# Here, we are going to enable some php features
+RUN sudo phpenmod php7.4-mailhog
+
+RUN sudo curl --silent -L -o /usr/local/bin/mailhog https://github.com/mailhog/MailHog/releases/download/v1.0.1/MailHog_linux_amd64 -o /usr/local/bin/mailhog && \
+    sudo curl --silent -L -o /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 -o /usr/local/bin/mhsendmail && \
+    sudo chmod +x /usr/local/bin/mailhog && \
+    sudo chmod +x /usr/local/bin/mhsendmail
 
 # Here, we are going to setup mysql server configurations, the stupid way but works.
 RUN sudo service mysql start 2> /dev/null && \
